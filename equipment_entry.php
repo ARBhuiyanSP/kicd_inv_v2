@@ -23,7 +23,7 @@ include 'header.php';
                         <div class="col-xs-2">
                             <div class="form-group">
                                 <label>Equipment ID</label>
-                                <input type="text" name="equipment_id" id="equipment_id" class="form-control" readonly="readonly" value="<?php echo getDefaultCategoryCode('equipments', 'equipment_id', '03d', '001', 'CTED-') ?>">
+                                <input type="text" name="equipment_id" id="equipment_id" class="form-control" readonly="readonly" value="<?php echo getDefaultCategoryCode('equipments', 'equipment_id', '03d', '001', 'KICD-') ?>">
                             </div>
                         </div>
 						<div class="col-xs-4">
