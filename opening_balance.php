@@ -6,9 +6,6 @@ include 'includes/opening_stock_process.php'; ?>
 display:none;
 
 }
-.table th, .table td {
-	padding:3px;
-}
 </style>
 <div class="container-fluid">
     <!-- Breadcrumbs-->
@@ -32,7 +29,7 @@ display:none;
 						
 						
 <div>
-    <form name="add_name" action="" method="post" id="opening_entry_form" onsubmit="showFormIsProcessing('opening_entry_form');">
+    <form name="" action="" method="post">
         <div class="col-xs-4" style="background-color:#007BFF;color:#fff;">
 			<div class="form-group">
 				<label>Opening Stock Entry Date</label>
@@ -59,19 +56,17 @@ display:none;
 		<table class="table table-condensed table-hover table-bordered">
 				<thead>
 					<tr style="background-color:#007BFF;color:#fff;">
-						<th width="10%">Category</th>
-						<th width="10%">Sub Category</th>
-						<th width="10%">Material Code</th>
-						<th width="20%">Material Name</th>
-						<th width="15%">Part No</th>
-						<th width="15%">Spec</th>
-						<th width="10%">Unit</th>
-						<th width="10%">OP Stock</th>
+						<th>Category</th>
+						<th>Sub Category</th>
+						<th>Material Code</th>
+						<th>Material Name</th>
+						<th>Unit</th>
+						<th>Opening Stock</th>
+						<th>Opening Stock Value</th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php
-						
 						$sql	=	"SELECT * FROM inv_material  GROUP BY `material_id`";
 						$result = mysqli_query($conn, $sql);
 						while($row=mysqli_fetch_array($result))
@@ -84,7 +79,7 @@ display:none;
 								echo (isset($dataresult) && !empty($dataresult) ? $dataresult->category_description : '');
 								?>
 							</td>
-							<td colspan="7"></td>
+							<td colspan="6"></td>
 						</tr>
 						<?php 
 							$material_id = $row['material_id'];
@@ -101,7 +96,7 @@ display:none;
 								echo (isset($dataresult) && !empty($dataresult) ? $dataresult->material_sub_description : '');
 								?>
 							</td>
-							<td colspan="6"></td>
+							<td colspan="5"></td>
 						</tr>
 						<?php 
 							$material_sub_id = $rowall['material_sub_id'];
@@ -115,26 +110,24 @@ display:none;
 							<td></td>
 							<td><input class="form-control" name="material_id_code[]" id="material_id_code" type="text" value="<?php echo $rowmat['material_id_code']; ?>" readonly /></td>
 							<td><input class="form-control" name="material_description[]" id="material_description" type="text" value="<?php echo $rowmat['material_description']; ?>" readonly /></td>
-							<td><input class="form-control" name="part_no" id="part_no" type="text" value="<?php echo $rowmat['part_no']; ?>" readonly /></td>
-							<td><input class="form-control" name="spec" id="spec" type="text" value="<?php echo $rowmat['spec']; ?>" readonly /></td>
 							<td><input class="form-control" name="material_description[]" id="material_description" type="text" value="<?php echo getDataRowByTableAndId('inv_item_unit', $rowmat['qty_unit'])->unit_name; ?>" readonly /></td>
 							
 							
 							<?php
 							$mb_materialid	=	$rowmat['material_id_code'];
 							$warehouse_id	=	$_SESSION['logged']['warehouse_id'];
-							$sqlop			=	"SELECT * FROM inv_materialbalance WHERE `mb_materialid` = '$mb_materialid' AND `mbtype`='OP' AND `warehouse_id`='$warehouse_id';";
+							$sqlop			=	"SELECT * FROM inv_materialbalance WHERE `mb_materialid` = '$mb_materialid' AND `mbtype`='OP' AND `warehouse_id`='$warehouse_id'";
 							$resultop		=	mysqli_query($conn, $sqlop);
 							$rowop			=	mysqli_fetch_array($resultop);
 							$rowcount 		=	mysqli_num_rows($resultop);
 							
-							if($rowcount > 0){
+							if($rowcount > 0 || $rowop['mbin_qty'] > 0){
 								$mbin_qty 		= $rowop['mbin_qty'];
 								$mbin_val 		= $rowop['mbin_val'];
+									$buttonName	= 'Update Data';
 								$submit_name	= 'op_edit';
 								if($mbin_qty > 0){
 									$validation 	= 'readonly';
-									$submit			= 'disabled';
 								}else{
 									$validation 	= '';
 									$submit			= '';
@@ -143,12 +136,13 @@ display:none;
 								$mbin_qty		= 0;
 								$mbin_val 		= 0;
 								$validation 	= '';
-								$submit			= '';
+								$buttonName			= 'Save Data';
 								$submit_name	= 'op_submit';
 							}
 							?>
 							
 							<td><input class="form-control" name="op_balance_qty[]" id="op_balance_qty" type="text" value="<?php echo $mbin_qty; ?>" <?php echo $validation; ?> /></td>
+							<td><input class="form-control" name="op_balance_val[]" id="op_balance_val" type="text" value="<?php echo $mbin_val; ?>" <?php echo $validation; ?> /></td>
 						</tr>
 						<?php } 
 						
@@ -157,17 +151,27 @@ display:none;
 						?>
 					</tbody>
 			</table>
+					<input type="hidden" name="op_date" value="<?php echo date('Y-m-d'); ?>">
 					<?php $project_id	= $_SESSION['logged']['project_id']; ?>
 					<input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
 					<?php $warehouse_id	= $_SESSION['logged']['warehouse_id']; ?>
 					<input type="hidden" name="warehouse_id" value="<?php echo $warehouse_id; ?>">
 			<div class="col-xs-12">
 				<div class="form-group">
-					<input type="submit" name="<?php echo $submit_name; ?>" id="submit" class="btn btn-block btn-info" style="" value="SAVE DATA" <?php echo $submit; ?>/>    
+					<input type="submit" name="<?php echo $submit_name; ?>" id="submit" class="btn btn-block btn-info" style="" value="<?php echo $buttonName; ?>"/>   					
 				</div>
 			</div>
     </form>
 </div>
+<!-- <div id="d2">
+    <button id='b1'>Show form</button>
+</div>
+<script>
+$('#b1,#b2').click(function () {
+    $('#d1,#d2').toggle();
+})
+</script> -->
+			
         </div>
     </div>
 
@@ -176,7 +180,7 @@ display:none;
 <?php include 'footer.php' ?>
 <script>
     $(function () {
-        $("#op_date").datepicker({
+        $("#invoice_date").datepicker({
             inline: true,
             dateFormat: "yy-mm-dd",
             yearRange: "-50:+10",

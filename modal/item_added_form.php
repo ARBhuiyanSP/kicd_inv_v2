@@ -120,11 +120,24 @@
                             </div>
                         </div></br>
                         <div class="form-group">
-                            <label class="control-label col-sm-5" for="name">Material min stock:</label>
+                            <label class="control-label col-sm-5" for="parent_code">Opening Qty:</label>
+                            <div class="col-sm-7">
+                                <input type="text" class="form-control" id="location" placeholder="op_balance_qty" name="op_balance_qty">
+                            </div>
+                        </div></br>
+                        <div class="form-group">
+                            <label class="control-label col-sm-5" for="parent_code">Unit Price:</label>
+                            <div class="col-sm-7">
+                                <input type="text" class="form-control" id="location" placeholder="op_balance_val" name="op_balance_val">
+                            </div>
+                        </div></br>
+                        <div class="form-group">
+                            <label class="control-label col-sm-5" for="name">Reoeder Lebel:</label>
                             <div class="col-sm-7">
                                 <input type="text" class="form-control" id="material_min_stock" placeholder="Material min stock" name="material_min_stock" required>
                             </div>
                         </div>
+						<input type="hidden" name="warehouse_id"  value="<?php echo $_SESSION['logged']['warehouse_id']; ?>" required>
                     </div>
                 </div>
                 <div class="modal-footer modal_footer_custom_background">

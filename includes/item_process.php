@@ -168,6 +168,10 @@ if(isset($_GET['process_type']) && $_GET['process_type'] == 'item'){
     $part_no			=   mysqli_real_escape_string($conn, $_POST['part_no']);
     $spec				=   mysqli_real_escape_string($conn, $_POST['spec']);
     $qty_unit           =   mysqli_real_escape_string($conn, $_POST['qty_unit']);
+    $op_balance_qty     =   mysqli_real_escape_string($conn, $_POST['op_balance_qty']);
+    $op_balance_val		=   mysqli_real_escape_string($conn, $_POST['op_balance_val']);
+    $today           	=   mysqli_real_escape_string($conn, date('Y-m-d'));
+    $warehouse_id   	=   mysqli_real_escape_string($conn, $_POST['warehouse_id']);
     $material_min_stock =   mysqli_real_escape_string($conn, $_POST['material_min_stock']);
     // check duplicate:
     $table = 'inv_material';
@@ -189,7 +193,17 @@ if(isset($_GET['process_type']) && $_GET['process_type'] == 'item'){
             $status      = 'success';
             $message     = 'Data have been successfully updated!';            
         }else{
-            $sql         = "INSERT INTO inv_material (material_id,material_sub_id,material_level3_id,material_level4_id,material_id_code,material_description,spec,material_min_stock,qty_unit,part_no) VALUES ('".$parent_id."','".$sub_item_id."','".$material_level3_id."','".$material_level4_id."', '".$item_code."','".$name."', '".$spec."', '".$material_min_stock."','".$qty_unit."','".$part_no."')";
+            $sql         = "INSERT INTO inv_material (material_id,material_sub_id,material_level3_id,material_level4_id,material_id_code,material_description,spec,material_min_stock,qty_unit,op_balance_qty,op_balance_val,part_no,current_balance) VALUES ('".$parent_id."','".$sub_item_id."','".$material_level3_id."','".$material_level4_id."', '".$item_code."','".$name."', '".$spec."', '".$material_min_stock."','".$qty_unit."','".$op_balance_qty."','".$op_balance_val."','".$part_no."','".$op_balance_qty."')";
+			
+			
+			$queryPro = "INSERT INTO `inv_product_price`(`mrr_no`,`material_id`, `receive_details_id`, `qty`, `price`,`part_no`, `status`) VALUES ('-','$item_code','0','$op_balance_qty','$op_balance_val','$part_no','1')";
+			$conn->query($queryPro);
+			
+			$mbin_val = $op_balance_qty * $op_balance_val;
+			//$warehouse_id	=	$_SESSION['logged']['warehouse_id'];
+			$query_inmb = "INSERT INTO `inv_materialbalance` (`mb_ref_id`,`mb_materialid`,`mb_date`,`mbin_qty`,`mbin_val`,`mbout_qty`,`mbout_val`,`mbprice`,`mbtype`,`mbserial`,`mbserial_id`,`mbunit_id`,`jvno`,`part_no`,`project_id`,`warehouse_id`,`approval_status`) VALUES ('OP','$item_code','$today','$op_balance_qty','$mbin_val','0','0','$op_balance_val','OP','1','1','$qty_unit','1','$part_no','1','$warehouse_id','0')";
+			$conn->query($query_inmb);
+			
             $status      = 'success';
             $message     = 'Data have been successfully inserted!';
             
